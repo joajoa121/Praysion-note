@@ -1,0 +1,11 @@
+{
+  "name": "Praysion Note",
+  "short_name": "이룸기도",
+  "description": "Prayer note app",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "orientation": "portrait"
+}
