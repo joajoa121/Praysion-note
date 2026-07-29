@@ -19,19 +19,6 @@
 <title>이룸기도 | Praysion Note</title>
 <link rel="stylesheet" href="assets/app.css"/>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
-<script>
-// new-body-scroll-fix
-document.addEventListener('DOMContentLoaded',()=>{
- const ta=document.getElementById('new-body');
- if(ta){
-   ta.addEventListener('input',()=>{
-     requestAnimationFrame(()=>{
-       ta.scrollIntoView({block:'nearest'});
-     });
-   });
- }
-});
-</script>
 </head><body>
 <div id="frame" class="page-list">
   <!-- 스플래시 -->
@@ -89,15 +76,17 @@ document.addEventListener('DOMContentLoaded',()=>{
   <div class="view" id="view-new">
 
     <div id="new-form">
-      <div>
-        <div class="cat-select-wrap" id="new-cat-chips"></div>
-      </div>
-      <div>
-        <textarea id="new-title" class="prayer-title-input" placeholder="기도제목을 입력하세요." data-i18n-placeholder="newTitle" rows="1"></textarea>
-      </div>
-      <div>
-        <textarea id="new-body" class="prayer-body-input" placeholder="기도내용을 자유롭게 입력하세요." data-i18n-placeholder="newBody"></textarea>
-      </div>
+      <section class="prayer-editor" aria-label="기도 작성">
+        <div class="prayer-editor-category">
+          <div class="cat-select-wrap" id="new-cat-chips"></div>
+        </div>
+        <div class="prayer-editor-title">
+          <textarea id="new-title" class="prayer-title-input" placeholder="기도제목을 입력하세요." data-i18n-placeholder="newTitle" rows="1"></textarea>
+        </div>
+        <div class="prayer-editor-body">
+          <textarea id="new-body" class="prayer-body-input" placeholder="기도내용을 자유롭게 입력하세요." data-i18n-placeholder="newBody"></textarea>
+        </div>
+      </section>
     </div>
     <div class="restore-btn-wrap">
       <button type="button" id="new-submit-btn" class="restore-btn new-submit-btn" data-new-prayer-action="submit" data-i18n="add" data-i18n-aria-label="newPrayerSubmitLabel" aria-label="새 기도제목 등록">등록</button>
@@ -123,14 +112,16 @@ document.addEventListener('DOMContentLoaded',()=>{
   <div class="view" id="view-detail">
 
     <div id="detail-scroll">
-      <div id="detail-cat-wrap"></div>
-      <div id="detail-title-wrap">
-        <textarea id="detail-title-input" class="prayer-title-input" placeholder="기도제목을 입력하세요." rows="1"></textarea>
-      </div>
-      <div id="detail-body-wrap">
-        <textarea id="detail-body-input" class="detail-body-input" rows="1" placeholder="기도 내용을 입력하세요."></textarea>
-        <div id="detail-created-at" class="detail-created-at"></div>
-      </div>
+      <section class="prayer-editor" aria-label="기도 상세">
+        <div id="detail-cat-wrap" class="prayer-editor-category"></div>
+        <div id="detail-title-wrap" class="prayer-editor-title">
+          <textarea id="detail-title-input" class="prayer-title-input" placeholder="기도제목을 입력하세요." rows="1"></textarea>
+        </div>
+        <div id="detail-body-wrap" class="prayer-editor-body">
+          <textarea id="detail-body-input" class="detail-body-input" rows="1" placeholder="기도 내용을 입력하세요."></textarea>
+          <div id="detail-created-at" class="detail-created-at"></div>
+        </div>
+      </section>
       <div id="memo-list"></div>
     </div>
     <div id="memo-add-area">
@@ -235,13 +226,13 @@ document.addEventListener('DOMContentLoaded',()=>{
       <div class="settings-title settings-title-spaced" data-i18n="langSettings">언어 설정</div>
 
       <div class="settings-item" data-lang-option="ko">
-        <span class="settings-item-icon"><span class="lang-letter-icon" aria-hidden="true">ㄱ</span></span>
+        <span class="settings-item-icon"><i class="ti ti-lang-ko" aria-hidden="true"></i></span>
         <span class="settings-item-label">한국어</span>
         <span class="settings-item-arrow lang-check" aria-hidden="true"><i class="ti ti-check"></i></span>
       </div>
 
       <div class="settings-item" data-lang-option="en">
-        <span class="settings-item-icon"><i class="ti ti-letter-a" aria-hidden="true"></i></span>
+        <span class="settings-item-icon"><i class="ti ti-lang-en" aria-hidden="true"></i></span>
         <span class="settings-item-label">English</span>
         <span class="settings-item-arrow lang-check" aria-hidden="true"><i class="ti ti-check"></i></span>
       </div>

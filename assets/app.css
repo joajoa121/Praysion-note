@@ -98,7 +98,7 @@ body{font-family:'Pretendard',sans-serif;background:#f0f0f0;display:flex;justify
 .memo-add-btn{flex:1;min-width:0;padding:0;font-size:15px;font-weight:600;border-radius:12px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;line-height:1;white-space:nowrap;}
 .memo-add-btn.record{background:#f2f0eb;color:#555;}
 .memo-add-btn.thanks{background:#4a7c59;color:#fff;}
-.memo-date{flex:1;font-size:12px;color:#bbb !important;}
+.memo-date{flex:1;font-size:14px;color:#bbb !important;}
 .memo-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
 .memo-actions{display:flex;gap:4px;}
 .memo-add-actions{display:flex;gap:8px;padding:8px 10px;justify-content:center;}
@@ -195,7 +195,6 @@ button.settings-item{width:100%;border:0;background:transparent;font:inherit;tex
 button.settings-item:focus-visible{outline:none;}
 .settings-item:active{background:#f7f7f5;}
 .settings-item-icon{font-size:20px;width:24px;text-align:center;}
-.lang-letter-icon{display:inline-block;font-family:Pretendard,"Noto Sans KR",sans-serif;font-size:19px;font-weight:600;line-height:1;}
 .settings-item-label{font-size:15px;color:#1a1a1a;flex:1;}
 .settings-item-arrow{font-size:16px;color:#ccc;}
 .lang-check{font-size:16px;color:#4a7c59;visibility:hidden;}
@@ -593,12 +592,9 @@ button:focus-visible,
   box-shadow:0 4px 16px rgba(0,0,0,.10) !important;
 }
 
-/* 수정 모드에서는 입력창이 사라지고 스크롤 여백도 줄어듦 */
+/* 수정 모드에서는 메모 입력 오버레이를 숨긴다. */
 #view-detail.detail-editing #memo-add-area{
   display:none !important;
-}
-#view-detail.detail-editing #detail-scroll{
-  padding-bottom:18px !important;
 }
 
 
@@ -830,14 +826,6 @@ body,
   appearance:none !important;
 }
 
-#view-new #new-form{
-  gap:16px !important;
-}
-
-#view-new #new-form > div{
-  padding-top:0 !important;
-}
-
 /* ===== Archive page ===== */
 /* 응답함 */
 #view-archive{
@@ -896,13 +884,14 @@ body,
   background:#fff !important;
 }
 #view-new #new-form{
+  display:block !important;
   flex:1 1 auto !important;
   min-height:0 !important;
   overflow-y:auto !important;
   overflow-x:hidden !important;
   -webkit-overflow-scrolling:touch !important;
-  padding:20px 16px !important;
-  gap:16px !important;
+  padding:0 0 calc(100px + var(--new-submit-kb-offset, 0px) + env(safe-area-inset-bottom, 0px)) !important;
+  scroll-padding-bottom:calc(100px + var(--new-submit-kb-offset, 0px) + env(safe-area-inset-bottom, 0px)) !important;
 }
 #view-new #new-body,
 #detail-body-input{
@@ -983,30 +972,11 @@ body,
 }
 
 
-/* RC7N29: keep new prayer content above keyboard-aware submit overlay */
-#view-new #new-form{
-  padding:20px 16px calc(180px + var(--new-submit-kb-offset, 0px) + env(safe-area-inset-bottom, 0px)) !important;
-  scroll-padding-bottom:calc(180px + var(--new-submit-kb-offset, 0px) + env(safe-area-inset-bottom, 0px)) !important;
-}
 #view-new #new-body{
-  min-height:180px !important;
+  min-height:100px !important;
 }
 
 
-/* RC7N32: unify chip-title-body rhythm across new/detail/edit screens */
-:root{
-  --pp-content-gap:16px;
-}
-#view-new #new-form{
-  gap:var(--pp-content-gap) !important;
-}
-#detail-cat-wrap{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  padding:20px 16px 0 !important;
-  margin-bottom:var(--pp-content-gap) !important;
-}
 .detail-category-readonly{pointer-events:none;}
 .detail-answered-tag{
   display:inline-flex;
@@ -1018,16 +988,6 @@ body,
 #view-detail.detail-editing #edit-detail-btn{
   color:#4a7c59;
 }
-#detail-title-wrap{
-  padding:0 16px 0 !important;
-  margin-bottom:var(--pp-content-gap) !important;
-}
-#detail-body-wrap{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  padding:0 16px 0 !important;
-}
 
 #detail-body-input{
   display:block;
@@ -1038,7 +998,7 @@ body,
 
 .detail-created-at{
   margin:0;
-  font-size:12px;
+  font-size:14px;
   line-height:1.4;
   color:#bbb;
 }
@@ -1055,38 +1015,44 @@ body,
 }
 
 
-/* RC9A03: TopBar slot collapse without fixed-search illusion
-   - TopBar layout height shrinks by the same numeric offset
-   - Search/category naturally move upward into the freed space
-   - No collapsed class geometry, no slide-container transform/margin
-   - Scroll anchoring is disabled around this shell to reduce snap-back */
+/* Compositor-only TopBar collapse
+   - Keep TopBar height/flex-basis fixed so scrolling never reflows #frame.
+   - Move the TopBar and active list/archive view visually with transforms only.
+   - This is an A/B test for the mobile scroll jitter regression. */
 #frame{
   --topbar-collapse-offset:0px;
   overflow-anchor:none;
 }
 #topbar{
-  height:calc(48px - var(--topbar-collapse-offset, 0px)) !important;
-  min-height:calc(48px - var(--topbar-collapse-offset, 0px)) !important;
-  max-height:calc(48px - var(--topbar-collapse-offset, 0px)) !important;
-  flex:0 0 calc(48px - var(--topbar-collapse-offset, 0px)) !important;
-  transform:none !important;
+  height:48px !important;
+  min-height:48px !important;
+  max-height:48px !important;
+  flex:0 0 48px !important;
+  transform:translate3d(0, calc(-1 * var(--topbar-collapse-offset, 0px)), 0) !important;
   overflow:hidden !important;
   opacity:1 !important;
   visibility:visible !important;
   pointer-events:auto !important;
-  will-change:height, flex-basis !important;
+  will-change:transform !important;
   transition:none !important;
   overflow-anchor:none;
+  contain:paint;
 }
 #topbar-back,
 #topbar-title,
 #topbar-actions{
-  transform:translateY(calc(-1 * var(--topbar-collapse-offset, 0px))) !important;
+  transform:none !important;
   transition:none !important;
-  will-change:transform !important;
+  will-change:auto !important;
 }
 #view-list,
-#view-archive,
+#view-archive{
+  margin-top:0 !important;
+  transform:translate3d(0, calc(-1 * var(--topbar-collapse-offset, 0px)), 0) !important;
+  will-change:transform !important;
+  transition:none !important;
+  overflow-anchor:none;
+}
 #slide-container,
 #archive-slide-container{
   margin-top:0 !important;
@@ -1111,6 +1077,7 @@ body,
 #frame.page-list #topbar-title,
 #frame.page-archive #topbar-title{
   font-family:"Caveat", cursive !important;
+  font-size:18px !important;
   color:#4A7C59 !important;
 }
 #frame.page-list #topbar-actions,
@@ -1250,3 +1217,84 @@ body,
 }
 .settings-title-spaced{margin-top:8px;}
 .visually-hidden-file{display:none;}
+
+/* TopBar collapse scope guard
+   Only the prayer list and archive may use --topbar-collapse-offset.
+   Detail/edit and other fixed-header pages always keep the TopBar visible. */
+#frame.page-detail,
+#frame.page-new,
+#frame.page-cat,
+#frame.page-backup,
+#frame.page-lock{
+  --topbar-collapse-offset:0px !important;
+}
+
+
+/* Keep detail editing content comfortably above the software keyboard. */
+#view-detail.detail-editing #detail-scroll{
+  padding-bottom:calc(100px + env(safe-area-inset-bottom, 0px)) !important;
+  scroll-padding-bottom:calc(100px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+
+/* Shared prayer editor component for new, detail, and edit states. */
+:root{
+  --prayer-editor-inline:16px;
+  --prayer-editor-top:20px;
+  --prayer-editor-title-body-gap:16px;
+  --prayer-editor-category-title-gap:20px;
+}
+
+/* The same category → title → body skeleton is used in all three states. */
+.prayer-editor{
+  display:flex;
+  flex-direction:column;
+  width:100%;
+  box-sizing:border-box;
+  padding:var(--prayer-editor-top) var(--prayer-editor-inline) 0;
+}
+.prayer-editor-category{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:0 0 var(--prayer-editor-category-title-gap);
+  padding:0 !important;
+}
+.prayer-editor-title{
+  margin:0 0 var(--prayer-editor-title-body-gap);
+  padding:0 !important;
+}
+.prayer-editor-body{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin:0;
+  padding:0 !important;
+}
+
+/* Outer containers own scrolling; the shared component owns content spacing. */
+#view-new #new-form > .prayer-editor{
+  min-height:100%;
+}
+#view-new #new-form > .prayer-editor > div{
+  padding-top:0 !important;
+}
+
+/* Detail view and detail edit use the exact same editor skeleton. */
+#detail-cat-wrap{
+  padding:0 !important;
+  margin-bottom:var(--prayer-editor-category-title-gap) !important;
+}
+#detail-title-wrap{
+  padding:0 !important;
+  margin-bottom:var(--prayer-editor-title-body-gap) !important;
+}
+#detail-body-wrap{
+  padding:0 !important;
+}
+
+/* Keep memo cards aligned with the shared editor's 16px content edge. */
+#memo-list{
+  padding-left:var(--prayer-editor-inline);
+  padding-right:var(--prayer-editor-inline);
+}

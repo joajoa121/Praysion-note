@@ -1,12 +1,10 @@
-const APP_VERSION = "1.0.64-pwa-icons";
+const APP_VERSION = "1.0.74-cleanup";
 const CACHE_NAME = `irum-prayer-v${APP_VERSION}`;
 
 const CORE_FILES = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./assets/icon-192.png",
-  "./assets/icon-512.png",
   "./core.js",
   "./lock.js",
   "./settings.js",

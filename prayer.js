@@ -1025,6 +1025,9 @@ async function toggleDetailEdit(event){
     if(!source) return;
     _editPrayerState=createEditPrayerState(source,titleEl,bodyEl);
 
+    // Detail editing must never inherit the list/archive TopBar offset.
+    if(typeof resetHeaderCollapse==='function') resetHeaderCollapse();
+
     setEditableField(titleEl,true);
     if(bodyEl){ setEditableField(bodyEl,true); }
     requestAnimationFrame(()=>{
