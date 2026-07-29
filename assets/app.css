@@ -1028,7 +1028,7 @@ body,
   min-height:48px !important;
   max-height:48px !important;
   flex:0 0 48px !important;
-  transform:translate3d(0, calc(-1 * var(--topbar-collapse-offset, 0px)), 0) !important;
+  transform:none !important;
   overflow:hidden !important;
   opacity:1 !important;
   visibility:visible !important;
@@ -1038,6 +1038,13 @@ body,
   overflow-anchor:none;
   contain:paint;
 }
+
+/* TopBar collapse is explicitly limited to list and archive pages. */
+#frame.page-list #topbar,
+#frame.page-archive #topbar{
+  transform:translate3d(0, calc(-1 * var(--topbar-collapse-offset, 0px)), 0) !important;
+}
+
 #topbar-back,
 #topbar-title,
 #topbar-actions{
