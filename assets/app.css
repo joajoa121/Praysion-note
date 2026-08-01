@@ -568,7 +568,6 @@ button:focus-visible,
   overflow-x:hidden !important;
   -webkit-overflow-scrolling:touch !important;
   padding-bottom:calc(178px + env(safe-area-inset-bottom, 0px)) !important;
-  overscroll-behavior-y:contain !important; /* Samsung Internet A/B test */
 }
 
 /* 메모 입력 영역을 스크롤 흐름 밖의 하단 오버레이로 분리 */
@@ -1305,4 +1304,17 @@ body,
 #memo-list{
   padding-left:var(--prayer-editor-inline);
   padding-right:var(--prayer-editor-inline);
+}
+
+
+/* Samsung Internet keyboard-scroll TopBar guard (A/B test) */
+#frame.page-detail > #topbar{
+  display:flex !important;
+  height:48px !important;
+  min-height:48px !important;
+  max-height:48px !important;
+  flex:0 0 48px !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  transform:none !important;
 }
