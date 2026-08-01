@@ -568,6 +568,7 @@ button:focus-visible,
   overflow-x:hidden !important;
   -webkit-overflow-scrolling:touch !important;
   padding-bottom:calc(178px + env(safe-area-inset-bottom, 0px)) !important;
+  overscroll-behavior-y:contain !important; /* Samsung Internet A/B test */
 }
 
 /* 메모 입력 영역을 스크롤 흐름 밖의 하단 오버레이로 분리 */
