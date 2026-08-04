@@ -153,6 +153,7 @@ function bindBootstrapEvents(){
   initLock();
   initAndroidBackButton();
   initFrameResizeObserver();
+  initGlobalKeyboardScrollGuard();
   afterNextPaint(refreshLocalizedUI);
 }
 
@@ -368,3 +369,124 @@ function bindSingleLineInputGuards(){
   });
 }
 
+
+// Samsung Internet keyboard/viewport scroll guard
+// ============================================================
+// Problem: on Android, focusing ANY <textarea>/<input> (typing, tapping the
+// on-screen keyboard, moving the caret) can make the browser scroll the
+// document itself to "keep the focused field visible" — even though #frame
+// has overflow:hidden and every internal panel scrolls on its own.
+// view-new already has its own keyboard-offset handling (RC7F/RC7H) which
+// happens to mask this, but view-detail (and view-cat) have no such
+// correction, so the whole #frame (topbar included) gets shoved upward.
+// This guard neutralizes that native shift for every view, generically,
+// instead of patching each page one at a time.
+function initGlobalKeyboardScrollGuard(){
+  if(window.__kbScrollGuardBound) return;
+  window.__kbScrollGuardBound=true;
+
+  let guarding=false;
+  let guardRaf=0;
+
+  function isTextEntryElement(el){
+    if(!el) return false;
+    if(el.isContentEditable) return true;
+    if(el.tagName==='TEXTAREA') return true;
+    if(el.tagName!=='INPUT') return false;
+
+    return [
+      'text',
+      'search',
+      'email',
+      'url',
+      'tel',
+      'password',
+      'number'
+    ].includes((el.type||'text').toLowerCase());
+  }
+
+  function restoreAppViewport(){
+    if(!guarding) return;
+
+    const frame=document.getElementById('frame');
+    const topbar=document.getElementById('topbar');
+
+    if(window.scrollX!==0 || window.scrollY!==0){
+      window.scrollTo(0,0);
+    }
+
+    if(frame){
+      frame.style.setProperty('top','0px','important');
+      frame.style.setProperty('left','0px','important');
+      frame.style.setProperty('transform','none','important');
+    }
+
+    if(frame?.classList.contains('page-detail') && topbar){
+      topbar.classList.add('visible');
+      topbar.style.setProperty('display','flex','important');
+      topbar.style.setProperty('transform','none','important');
+    }
+  }
+
+  function runGuardLoop(){
+    if(!guarding){
+      guardRaf=0;
+      return;
+    }
+
+    restoreAppViewport();
+    guardRaf=requestAnimationFrame(runGuardLoop);
+  }
+
+  function startGuard(){
+    guarding=true;
+    if(!guardRaf) guardRaf=requestAnimationFrame(runGuardLoop);
+  }
+
+  function stopGuardLater(){
+    requestAnimationFrame(()=>{
+      guarding=isTextEntryElement(document.activeElement);
+      if(!guarding && guardRaf){
+        cancelAnimationFrame(guardRaf);
+        guardRaf=0;
+      }
+    });
+  }
+
+  document.addEventListener('focusin',event=>{
+    if(!isTextEntryElement(event.target)) return;
+    startGuard();
+  },true);
+
+  document.addEventListener('focusout',event=>{
+    if(!isTextEntryElement(event.target)) return;
+    stopGuardLater();
+  },true);
+
+  [
+    'keydown',
+    'keyup',
+    'beforeinput',
+    'input',
+    'compositionstart',
+    'compositionupdate',
+    'compositionend',
+    'selectionchange'
+  ].forEach(eventName=>{
+    document.addEventListener(eventName,()=>{
+      if(!isTextEntryElement(document.activeElement)) return;
+      startGuard();
+      restoreAppViewport();
+    },true);
+  });
+
+  window.addEventListener('scroll',restoreAppViewport,{passive:true});
+  window.addEventListener('resize',restoreAppViewport);
+
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize',restoreAppViewport);
+    window.visualViewport.addEventListener('scroll',restoreAppViewport);
+  }
+}
+
+// ============================================================
