@@ -653,6 +653,17 @@ body,
     margin:0 !important;
     border-radius:0 !important;
     box-shadow:none !important;
+    /* RC10B: pin the app shell to the viewport itself, not to document flow.
+       Some Android browsers/WebViews force-scroll the document to reveal a
+       focused input, bypassing body{overflow:hidden}. A fixed #frame can't
+       be dragged along by that scroll (transform on the frame's ancestors
+       would break this, but there is none here), so the topbar stays put
+       even if the underlying document momentarily scrolls. */
+    position:fixed !important;
+    top:0 !important;
+    left:0 !important;
+    right:0 !important;
+    bottom:0 !important;
   }
   #splash,
   #settings-overlay{
