@@ -489,4 +489,6 @@ function initGlobalKeyboardScrollGuard(){
   }
 }
 
+
+<script src="./debug-topbar.js"></script>
 // ============================================================
