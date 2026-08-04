@@ -779,9 +779,16 @@ function ensureDetailActionDelegation(detailView){
   });
   detailView.addEventListener('input',event=>{
     const field=event.target;
-    if(field?.id==='detail-title-input' || field?.id==='detail-body-input'){
+
+    // Keep the single-line title auto-sizing behavior.
+    if(field?.id==='detail-title-input'){
       resizeTextareaToContent(field);
     }
+
+    // Samsung Internet A/B test:
+    // Do not resize #detail-body-input on every IME/input event.
+    // Repeated textarea height changes can trigger viewport relayout
+    // while the software keyboard is open.
   });
   detailView.dataset.detailActionsBound='1';
 }
