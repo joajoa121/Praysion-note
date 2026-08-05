@@ -372,15 +372,6 @@ function bindSingleLineInputGuards(){
 
 // Samsung Internet keyboard/viewport scroll guard
 // ============================================================
-// Problem: on Android, focusing ANY <textarea>/<input> (typing, tapping the
-// on-screen keyboard, moving the caret) can make the browser scroll the
-// document itself to "keep the focused field visible" — even though #frame
-// has overflow:hidden and every internal panel scrolls on its own.
-// view-new already has its own keyboard-offset handling (RC7F/RC7H) which
-// happens to mask this, but view-detail (and view-cat) have no such
-// correction, so the whole #frame (topbar included) gets shoved upward.
-// This guard neutralizes that native shift for every view, generically,
-// instead of patching each page one at a time.
 function initGlobalKeyboardScrollGuard(){
   if(window.__kbScrollGuardBound) return;
   window.__kbScrollGuardBound=true;
@@ -421,7 +412,9 @@ function initGlobalKeyboardScrollGuard(){
       frame.style.setProperty('transform','none','important');
     }
 
-    if(frame?.classList.contains('page-detail') && topbar){
+    // 💡 [수정된 부분] page-detail 클래스 대신 실제 view-detail 표시 상태를 감지하여 고정시킵니다.
+    const isDetailView = document.getElementById('view-detail')?.classList.contains('visible');
+    if(isDetailView && topbar){
       topbar.classList.add('visible');
       topbar.style.setProperty('display','flex','important');
       topbar.style.setProperty('transform','none','important');
@@ -488,7 +481,3 @@ function initGlobalKeyboardScrollGuard(){
     window.visualViewport.addEventListener('scroll',restoreAppViewport);
   }
 }
-
-
-<script src="./debug-topbar.js"></script>
-// ============================================================
