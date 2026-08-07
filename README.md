@@ -1,2 +1,0 @@
-# Praysion-note
-Praysion-note
